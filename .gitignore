@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Claude
+.claude/
+
+# Cache
+cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large data files (keep CSVs in data/ folder)
+*.numbers
