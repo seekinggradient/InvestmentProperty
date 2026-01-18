@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bnbpro.ai | AI-Powered AirBnB Optimization</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-cream: #faf8f5;
+            --bg-warm: #f5f0e8;
+            --text-primary: #1a2332;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            --accent-amber: #d97706;
+            --accent-amber-light: #fbbf24;
+            --accent-coral: #e85d50;
+            --accent-teal: #0d9488;
+            --border-light: #e8e4dc;
+            --card-bg: #ffffff;
+            --navy-deep: #0f172a;
+            --navy-soft: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-cream);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Subtle grain texture */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.02;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1.25rem 0;
+            background: rgba(250, 248, 245, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            border-bottom-color: var(--border-light);
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Fraunces', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-coral) 0%, var(--accent-amber) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a.btn {
+            color: white;
+        }
+
+        .nav-links a.btn:hover {
+            color: white;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--navy-soft);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(26, 35, 50, 0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1.5px solid var(--border-light);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--text-primary);
+            background: var(--text-primary);
+            color: white;
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent-coral) 0%, var(--accent-amber) 100%);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(232, 93, 80, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 8rem 0 6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .hero-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.5;
+        }
+
+        .hero-shape-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.15) 0%, transparent 70%);
+            top: -200px;
+            right: -100px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .hero-shape-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(232, 93, 80, 0.1) 0%, transparent 70%);
+            bottom: -100px;
+            left: -100px;
+            animation: float 15s ease-in-out infinite reverse;
+        }
+
+        .hero-shape-3 {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(13, 148, 136, 0.1) 0%, transparent 70%);
+            top: 40%;
+            left: 20%;
+            animation: float 12s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        .hero .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .hero-badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-teal);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .hero h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 3.5rem;
+            font-weight: 600;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--accent-coral) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-description {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 480px;
+            line-height: 1.7;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+        }
+
+        .hero-stat {
+            text-align: left;
+        }
+
+        .hero-stat-value {
+            font-family: 'Fraunces', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .hero-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Hero Visual */
+        .hero-visual {
+            position: relative;
+            animation: fadeInUp 0.8s ease 0.2s forwards;
+            opacity: 0;
+        }
+
+        .hero-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .hero-card-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--bg-warm) 0%, var(--border-light) 100%);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(135deg, transparent 40%, rgba(232, 93, 80, 0.1) 100%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 10 L50 25 L50 50 L10 50 L10 25 Z' fill='none' stroke='%23d97706' stroke-width='1' opacity='0.3'/%3E%3Crect x='22' y='35' width='16' height='15' fill='none' stroke='%23d97706' stroke-width='1' opacity='0.3'/%3E%3C/svg%3E");
+            background-size: cover, 60px 60px;
+        }
+
+        .hero-card-content h3 {
+            font-family: 'Fraunces', serif;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .hero-card-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--accent-amber);
+        }
+
+        .hero-card-score {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: var(--bg-warm);
+            border-radius: 10px;
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .score-value {
+            font-family: 'Fraunces', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-teal);
+        }
+
+        .score-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--border-light);
+            border-radius: 4px;
+            margin: 0 1rem;
+            overflow: hidden;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            width: 87%;
+            background: linear-gradient(90deg, var(--accent-teal), var(--accent-amber));
+            border-radius: 4px;
+            animation: fillBar 1.5s ease 0.5s forwards;
+            transform-origin: left;
+            transform: scaleX(0);
+        }
+
+        @keyframes fillBar {
+            to { transform: scaleX(1); }
+        }
+
+        /* Floating insight cards */
+        .hero-insight {
+            position: absolute;
+            background: var(--card-bg);
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: floatCard 3s ease-in-out infinite;
+        }
+
+        .hero-insight-1 {
+            top: -20px;
+            right: -30px;
+            animation-delay: 0s;
+        }
+
+        .hero-insight-2 {
+            bottom: 60px;
+            left: -40px;
+            animation-delay: 1s;
+        }
+
+        @keyframes floatCard {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .insight-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .insight-icon.green { background: rgba(13, 148, 136, 0.1); }
+        .insight-icon.amber { background: rgba(217, 119, 6, 0.1); }
+
+        /* Features Section */
+        .features {
+            padding: 8rem 0;
+            background: var(--card-bg);
+            position: relative;
+        }
+
+        .features::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-light), transparent);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 4rem;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--accent-coral);
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-family: 'Fraunces', serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--bg-cream);
+            border-radius: 20px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            border: 1px solid transparent;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-light);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.06);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            opacity: 0.5;
+            transition: all 0.4s ease;
+        }
+
+        .feature-card.hosts::before {
+            background: radial-gradient(circle, rgba(232, 93, 80, 0.1) 0%, transparent 70%);
+        }
+
+        .feature-card.guests::before {
+            background: radial-gradient(circle, rgba(13, 148, 136, 0.1) 0%, transparent 70%);
+        }
+
+        .feature-card:hover::before {
+            transform: scale(1.5);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-card.hosts .feature-icon {
+            background: linear-gradient(135deg, rgba(232, 93, 80, 0.15) 0%, rgba(217, 119, 6, 0.15) 100%);
+        }
+
+        .feature-card.guests .feature-icon {
+            background: rgba(13, 148, 136, 0.1);
+        }
+
+        .feature-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-card.hosts .feature-label { color: var(--accent-coral); }
+        .feature-card.guests .feature-label { color: var(--accent-teal); }
+
+        .feature-card h3 {
+            font-family: 'Fraunces', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+            line-height: 1.7;
+        }
+
+        .feature-list {
+            list-style: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        .feature-card.hosts .feature-list li::before {
+            background: rgba(232, 93, 80, 0.1);
+            color: var(--accent-coral);
+        }
+
+        .feature-card.guests .feature-list li::before {
+            background: rgba(13, 148, 136, 0.1);
+            color: var(--accent-teal);
+        }
+
+        /* Free Tools Section */
+        .tools {
+            padding: 8rem 0;
+            background: var(--bg-cream);
+        }
+
+        .tools-card {
+            background: var(--navy-deep);
+            border-radius: 24px;
+            padding: 3rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .tools-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(217, 119, 6, 0.15) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .tools-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .tools-content .section-label {
+            color: var(--accent-amber-light);
+        }
+
+        .tools-content h2 {
+            font-family: 'Fraunces', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .tools-content p {
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 2rem;
+            line-height: 1.7;
+        }
+
+        .tools-visual {
+            position: relative;
+            z-index: 1;
+        }
+
+        .tool-preview {
+            background: var(--navy-soft);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tool-preview-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tool-preview-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-coral) 0%, var(--accent-amber) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .tool-preview-title {
+            color: white;
+            font-weight: 500;
+        }
+
+        .tool-preview-subtitle {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .tool-preview-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .tool-stat {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        .tool-stat-value {
+            font-family: 'Fraunces', serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--accent-amber-light);
+        }
+
+        .tool-stat-label {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Waitlist Section */
+        .waitlist {
+            padding: 8rem 0;
+            background: var(--card-bg);
+            position: relative;
+        }
+
+        .waitlist::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-light), transparent);
+        }
+
+        .waitlist-content {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .waitlist h2 {
+            font-family: 'Fraunces', serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .waitlist p {
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .waitlist-form {
+            display: flex;
+            gap: 0.75rem;
+            max-width: 480px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .waitlist-form input {
+            flex: 1;
+            padding: 1rem 1.25rem;
+            border: 1.5px solid var(--border-light);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-cream);
+            transition: all 0.3s ease;
+        }
+
+        .waitlist-form input:focus {
+            outline: none;
+            border-color: var(--accent-coral);
+            background: white;
+        }
+
+        .waitlist-form input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .waitlist-form button {
+            padding: 1rem 2rem;
+            white-space: nowrap;
+        }
+
+        .waitlist-note {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 0 2rem;
+            background: var(--navy-deep);
+            color: white;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-content-simple {
+            grid-template-columns: 2fr 1fr 1fr;
+        }
+
+        .footer-brand .logo {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .footer-brand p {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .footer-column h4 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 1.25rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-column a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+
+        .footer-column a:hover {
+            color: var(--accent-amber-light);
+        }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero .container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-content {
+                order: 1;
+            }
+
+            .hero-visual {
+                order: 2;
+                max-width: 500px;
+                margin: 0 auto;
+            }
+
+            .hero h1 {
+                font-size: 2.75rem;
+            }
+
+            .hero-description {
+                margin: 0 auto 2rem;
+            }
+
+            .hero-ctas {
+                justify-content: center;
+            }
+
+            .hero-stats {
+                justify-content: center;
+            }
+
+            .hero-insight-1 {
+                right: 0;
+            }
+
+            .hero-insight-2 {
+                left: 0;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tools-card {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.25rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .waitlist-form {
+                flex-direction: column;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+
+        /* Scroll reveal animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="#" class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 3L4 9V21H9V14H15V21H20V9L12 3Z"/>
+                    </svg>
+                </div>
+                bnbpro.ai
+            </a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#tools">Free Tools</a>
+                <a href="#waitlist">Join Waitlist</a>
+                <a href="#waitlist" class="btn btn-primary">Get Early Access</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-bg-shapes">
+            <div class="hero-shape hero-shape-1"></div>
+            <div class="hero-shape hero-shape-2"></div>
+            <div class="hero-shape hero-shape-3"></div>
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="hero-badge-dot"></span>
+                    AI-Powered Insights for AirBnB
+                </div>
+                <h1>Optimize your AirBnB with <span>intelligent analysis</span></h1>
+                <p class="hero-description">Whether you're a host looking to maximize bookings or a guest comparing options, our AI analyzes every detail to help you make smarter decisions.</p>
+                <div class="hero-ctas">
+                    <a href="#waitlist" class="btn btn-accent">Join the Waitlist</a>
+                    <a href="#features" class="btn btn-secondary">Learn More</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">87%</div>
+                        <div class="hero-stat-label">Avg. Score Improvement</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">2.4x</div>
+                        <div class="hero-stat-label">More Bookings</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">50+</div>
+                        <div class="hero-stat-label">Factors Analyzed</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-card">
+                    <div class="hero-card-image"></div>
+                    <div class="hero-card-content">
+                        <h3>Cozy Downtown Loft</h3>
+                        <div class="hero-card-meta">
+                            <span class="hero-card-rating">★ 4.92</span>
+                            <span>·</span>
+                            <span>128 reviews</span>
+                        </div>
+                        <div class="hero-card-score">
+                            <div>
+                                <div class="score-label">Listing Score</div>
+                            </div>
+                            <div class="score-bar">
+                                <div class="score-bar-fill"></div>
+                            </div>
+                            <div class="score-value">87/100</div>
+                        </div>
+                    </div>
+                    <div class="hero-insight hero-insight-1">
+                        <div class="insight-icon green">📸</div>
+                        <span>Photos +23% quality</span>
+                    </div>
+                    <div class="hero-insight hero-insight-2">
+                        <div class="insight-icon amber">💰</div>
+                        <span>Price optimized</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header reveal">
+                <div class="section-label">Two Powerful Tools</div>
+                <h2 class="section-title">Built for hosts and guests</h2>
+                <p class="section-subtitle">Whether you manage properties or book them, bnbpro.ai gives you the insights you need.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card hosts reveal">
+                    <div class="feature-icon">🏠</div>
+                    <div class="feature-label">For Hosts</div>
+                    <h3>Optimize Your Listing</h3>
+                    <p>Paste your AirBnB link and get instant AI-powered feedback on how to improve your listing, increase bookings, and maximize revenue.</p>
+                    <ul class="feature-list">
+                        <li>Photo quality & composition analysis</li>
+                        <li>Title & description optimization</li>
+                        <li>Pricing recommendations</li>
+                        <li>Amenity suggestions based on market</li>
+                        <li>Competitor benchmarking</li>
+                    </ul>
+                </div>
+                <div class="feature-card guests reveal">
+                    <div class="feature-icon">🔍</div>
+                    <div class="feature-label">For Guests</div>
+                    <h3>Compare Listings</h3>
+                    <p>Add multiple AirBnB links to compare properties side-by-side with structured analysis and clear recommendations.</p>
+                    <ul class="feature-list">
+                        <li>Side-by-side comparison tables</li>
+                        <li>Value-for-money scoring</li>
+                        <li>Location & amenity analysis</li>
+                        <li>Review sentiment breakdown</li>
+                        <li>Hidden fee detection</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="tools" id="tools">
+        <div class="container">
+            <div class="tools-card reveal">
+                <div class="tools-content">
+                    <div class="section-label">Free Tools</div>
+                    <h2>Investment Property Analyzer</h2>
+                    <p>Explore 78+ US metro markets with our interactive dashboard. Analyze appreciation potential, cash flow scores, and migration trends to find your next investment property.</p>
+                    <a href="dashboard.html" class="btn btn-accent">Explore Markets →</a>
+                </div>
+                <div class="tools-visual">
+                    <div class="tool-preview">
+                        <div class="tool-preview-header">
+                            <div class="tool-preview-icon">📊</div>
+                            <div>
+                                <div class="tool-preview-title">Market Analysis Dashboard</div>
+                                <div class="tool-preview-subtitle">Real-time investment insights</div>
+                            </div>
+                        </div>
+                        <div class="tool-preview-stats">
+                            <div class="tool-stat">
+                                <div class="tool-stat-value">78</div>
+                                <div class="tool-stat-label">Markets</div>
+                            </div>
+                            <div class="tool-stat">
+                                <div class="tool-stat-value">50.6</div>
+                                <div class="tool-stat-label">Avg Score</div>
+                            </div>
+                            <div class="tool-stat">
+                                <div class="tool-stat-value">IRS</div>
+                                <div class="tool-stat-label">Data Source</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="waitlist" id="waitlist">
+        <div class="container">
+            <div class="waitlist-content reveal">
+                <div class="section-label">Coming Soon</div>
+                <h2>Be the first to know</h2>
+                <p>We're building something special. Join the waitlist to get early access and be notified when we launch.</p>
+                <form class="waitlist-form" onsubmit="handleWaitlist(event)">
+                    <input type="email" placeholder="Enter your email" required>
+                    <button type="submit" class="btn btn-accent">Join Waitlist</button>
+                </form>
+                <p class="waitlist-note">No spam, ever. We'll only email you when we launch.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content footer-content-simple">
+                <div class="footer-brand">
+                    <a href="#" class="logo">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 3L4 9V21H9V14H15V21H20V9L12 3Z"/>
+                            </svg>
+                        </div>
+                        bnbpro.ai
+                    </a>
+                    <p>AI-powered tools to help AirBnB hosts maximize their listings and guests find their perfect stay.</p>
+                </div>
+                <div class="footer-column">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#features">For Hosts</a></li>
+                        <li><a href="#features">For Guests</a></li>
+                        <li><a href="dashboard.html">Free Tools</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Get Started</h4>
+                    <ul>
+                        <li><a href="#waitlist">Join Waitlist</a></li>
+                        <li><a href="mailto:hello@bnbpro.ai">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 bnbpro.ai. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Scroll reveal
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Waitlist form handler (placeholder)
+        function handleWaitlist(e) {
+            e.preventDefault();
+            const email = e.target.querySelector('input').value;
+
+            // For now, just show an alert - backend implementation later
+            alert(`Thanks for joining! We'll notify ${email} when we launch.`);
+            e.target.reset();
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
