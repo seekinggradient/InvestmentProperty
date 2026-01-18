@@ -101,6 +101,19 @@
             letter-spacing: 0.2em;
         }
 
+        .back-link {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-warm);
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent-hot);
+        }
+
         .header-stats {
             display: flex;
             gap: 2.5rem;
@@ -1055,7 +1068,7 @@
         <header>
             <div class="logo">
                 <h1>Investment Finder</h1>
-                <span>by bnbpro.ai</span>
+                <a href="index.html" class="back-link">← bnbpro.ai</a>
             </div>
             <div class="header-stats">
                 <div class="stat-item">
